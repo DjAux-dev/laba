@@ -1,8 +1,5 @@
 package functions;
 
-/**
- * Linear function: f(x) = a * x + b
- */
 public final class LinearFunction implements MathFunction {
     private final double a;
     private final double b;

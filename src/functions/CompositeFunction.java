@@ -1,8 +1,5 @@
 package functions;
 
-/**
- * Composite function h(x) = g(f(x))
- */
 public final class CompositeFunction implements MathFunction {
     private final MathFunction firstFunction;  // f
     private final MathFunction secondFunction; // g

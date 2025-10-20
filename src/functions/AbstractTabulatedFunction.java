@@ -1,8 +1,6 @@
 package functions;
 
-/**
- * Abstract base for tabulated functions providing common interpolation/extrapolation helpers.
- */
+
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
 
@@ -11,9 +9,7 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         return count;
     }
 
-    /**
-     * Returns floor index i such that getX(i) <= x, or throws if x < leftBound().
-     */
+
     protected int floorIndexOfX(double x) {
         if (x < leftBound()) {
             throw new IllegalArgumentException("x is less than left bound");

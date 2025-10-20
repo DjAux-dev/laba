@@ -1,9 +1,5 @@
 package functions;
 
-/**
- * One Newton's method iteration mapping: x -> x - f(x)/f'(x)
- * Accepts two functions: f and its derivative df.
- */
 public final class NewtonMethodFunction implements MathFunction {
     private final MathFunction function;
     private final MathFunction derivative;
