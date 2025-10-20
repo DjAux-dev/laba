@@ -6,7 +6,7 @@ public class AndThenMethodTest {
         MathFunction lin = new LinearFunction(2.0, 3.0); // 2x+3
         MathFunction sqr = new SqrFunction(); // x^2
 
-        // Identity chaining
+        // Identity chaining.
         TestUtils.assertEquals(5.0, id.andThen(id).apply(5.0));
 
         // Simple two-step: (2x+3) then square => (2x+3)^2
