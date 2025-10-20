@@ -1,7 +1,7 @@
 package functions;
 
-public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
-    private Node head; // null when empty, otherwise points to head (x increasing around the ring)
+public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable {
+    private Node head;
 
     private void addNode(double x, double y) {
         Node node = new Node();
@@ -42,7 +42,6 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
             double t = a; a = b; b = t;
         }
         if (count == 1) {
-            // Fill single repeated value
             addNode(a, source.apply(a));
             return;
         }
@@ -114,6 +113,24 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
     public double rightBound() {
         if (head == null) throw new IllegalStateException("Empty list");
         return head.prev.x;
+    }
+
+    @Override
+    public void remove(int index) {
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException();
+        if (head == null) throw new IllegalStateException("Empty list");
+        Node node = getNode(index);
+        if (count == 1) {
+            head = null;
+            count = 0;
+            return;
+        }
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        if (node == head) {
+            head = node.next;
+        }
+        count--;
     }
 }
 
