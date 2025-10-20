@@ -45,10 +45,70 @@ public class FunctionsTest {
             MathFunction h2 = new CompositeFunction(f2, g2); // 0.5x-1
 
             MathFunction big = new CompositeFunction(h1, h2); // (0.5*(-(2x+3)) - 1)
-            assertAlmostEquals(-2.5, big.apply(2.0)); // 0.5*(-7)-1 = -3.5-1 = -4.5? wait; compute carefully:
-            // Correct expected: f1(2)=7, g1(7)=-7, then f2(-7)=-3.5-1=-4.5
+            // f1(2)=7, g1(7)=-7, then f2(-7)=-3.5-1=-4.5
             assertAlmostEquals(-4.5, big.apply(2.0));
-            passed += 2; // one of them is intentionally wrong to ensure failure is visible if not handled
+            passed += 1;
+        } catch (AssertionError e) { failed++; e.printStackTrace(); }
+
+        // LinkedListTabulatedFunction: constructor from arrays and basic ops
+        try {
+            double[] xs = {0.0, 1.0, 2.0, 4.0};
+            double[] ys = {0.0, 1.0, 4.0, 16.0};
+            TabulatedFunction tf = new LinkedListTabulatedFunction(xs, ys);
+            assertEquals(4, tf.getCount());
+            assertEquals(0.0, tf.leftBound());
+            assertEquals(4.0, tf.rightBound());
+            assertEquals(2.0, tf.getX(2));
+            assertEquals(4.0, tf.getY(2));
+            tf.setY(2, 5.0);
+            assertEquals(5.0, tf.getY(2));
+            assertEquals(0, tf.indexOfX(0.0));
+            assertEquals(2, tf.indexOfX(2.0));
+            assertEquals(-1, tf.indexOfX(3.0));
+            assertEquals(2, tf.indexOfY(5.0));
+            assertEquals(-1, tf.indexOfY(2.0));
+            // interpolation inside [1,2] with points (1,1) and (2,5)
+            assertAlmostEquals(3.0, tf.apply(1.5));
+            // left extrapolation using first segment slope: between (0,0) and (1,1)
+            assertAlmostEquals(-0.5, tf.apply(-0.5));
+            // right extrapolation using last segment slope: between (2,5) and (4,16)
+            // slope = (16-5)/(4-2) = 5.5; at x=5 -> 5 + 5.5*(3) = 21.5
+            assertAlmostEquals(21.5, tf.apply(5.0));
+            passed += 14;
+        } catch (AssertionError e) { failed++; e.printStackTrace(); }
+
+        // LinkedListTabulatedFunction: constructor from source function with discretization
+        try {
+            MathFunction src = x -> x * x; // x^2
+            TabulatedFunction tf = new LinkedListTabulatedFunction(src, 2.0, 0.0, 3); // reversed bounds -> 0,1,2
+            assertEquals(3, tf.getCount());
+            assertEquals(0.0, tf.leftBound());
+            assertEquals(2.0, tf.rightBound());
+            assertEquals(0.0, tf.getX(0));
+            assertEquals(1.0, tf.getX(1));
+            assertEquals(2.0, tf.getX(2));
+            assertEquals(0.0, tf.getY(0));
+            assertEquals(1.0, tf.getY(1));
+            assertEquals(4.0, tf.getY(2));
+            // interpolate at 0.5 => 0.25
+            assertAlmostEquals(0.25, tf.apply(0.5));
+            passed += 10;
+        } catch (AssertionError e) { failed++; e.printStackTrace(); }
+
+        // Composition: tabulated with other functions
+        try {
+            TabulatedFunction tf = new LinkedListTabulatedFunction(
+                new double[]{0.0, 1.0, 2.0}, new double[]{0.0, 1.0, 4.0}
+            ); // approximates x^2
+            MathFunction linear = new LinearFunction(2.0, -1.0); // 2x-1
+            MathFunction composed = new CompositeFunction(tf, linear); // (2 * tf(x) - 1)
+            // At x=1.5, tf interpolates between (1,1) and (2,4) -> 2.5, then 2*2.5 -1 = 4
+            assertAlmostEquals(4.0, composed.apply(1.5));
+            // Compose in reverse order: linear first, then tf
+            MathFunction composed2 = new CompositeFunction(linear, tf);
+            // At x=2, linear=3, tf at 3 extrapolates right between (1,1)-(2,4): slope 3, extrap from 2 -> y=4+3*(1)=7
+            assertAlmostEquals(7.0, composed2.apply(2.0));
+            passed += 2;
         } catch (AssertionError e) { failed++; e.printStackTrace(); }
 
         // NewtonMethodFunction tests: Solve for root of f(x)=x^2-2, f'(x)=2x
