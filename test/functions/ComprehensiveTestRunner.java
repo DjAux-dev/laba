@@ -9,19 +9,35 @@ public class ComprehensiveTestRunner {
             ArrayTabulatedFunctionTest.run();
             System.out.println("✓ ArrayTabulatedFunction tests passed");
             
-            System.out.println("\n2. Testing Complex Function Compositions...");
+            System.out.println("\n2. Testing Validation and Exceptions...");
+            ValidationAndExceptionsTest.run();
+            System.out.println("✓ Validation and exception tests passed");
+            
+            System.out.println("\n3. Testing Array Iterator...");
+            ArrayIteratorTest.run();
+            System.out.println("✓ Array iterator tests passed");
+            
+            System.out.println("\n4. Testing Operations Service...");
+            OperationsServiceTest.run();
+            System.out.println("✓ Operations service tests passed");
+            
+            System.out.println("\n5. Testing Operations Service Binary Ops...");
+            OperationsServiceBinaryOpsTest.run();
+            System.out.println("✓ Operations service binary ops tests passed");
+            
+            System.out.println("\n6. Testing Complex Function Compositions...");
             ComplexFunctionCompositionTest.run();
             System.out.println("✓ Complex composition tests passed");
             
-            System.out.println("\n3. Testing Numerical Methods with Tabulated Functions...");
+            System.out.println("\n7. Testing Numerical Methods with Tabulated Functions...");
             NumericalMethodsWithTabulatedTest.run();
             System.out.println("✓ Numerical methods tests passed");
             
-            System.out.println("\n4. Testing Performance and Stress Scenarios...");
+            System.out.println("\n8. Testing Performance and Stress Scenarios...");
             PerformanceAndStressTest.run();
             System.out.println("✓ Performance and stress tests passed");
             
-            System.out.println("\n5. Testing Compatibility...");
+            System.out.println("\n9. Testing Compatibility...");
             CompatibilityTest.run();
             System.out.println("✓ Compatibility tests passed");
             

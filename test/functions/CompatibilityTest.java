@@ -108,3 +108,4 @@ public class CompatibilityTest {
         System.out.println("✓ Backward compatibility verified");
     }
 }
+

@@ -1,5 +1,7 @@
 package functions;
 
+import exceptions.ArrayIsNotSortedException;
+import exceptions.DifferentLengthOfArraysException;
 
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
@@ -9,54 +11,34 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         return count;
     }
 
+    public static void checkLengthIsTheSame(double[] xValues, double[] yValues) {
+        if (xValues.length != yValues.length) {
+            throw new DifferentLengthOfArraysException();
+        }
+    }
 
-    protected int floorIndexOfX(double x) {
-        if (x < leftBound()) {
-            throw new IllegalArgumentException("x is less than left bound");
-        }
-        int n = getCount();
-        if (n == 0) {
-            throw new IllegalStateException("No points in tabulated function");
-        }
-        if (n == 1) {
-            return 0;
-        }
-        if (x >= rightBound()) {
-            return n - 2; // last segment start
-        }
-        // Linear scan; list-backed impls can override for speed if desired
-        for (int i = 0; i < n - 1; i++) {
-            double xi = getX(i);
-            double xj = getX(i + 1);
-            if (xi <= x && x <= xj) {
-                return i;
+    public static void checkSorted(double[] xValues) {
+        for (int i = 0; i + 1 < xValues.length; i++) {
+            if (xValues[i] >= xValues[i + 1]) {
+                throw new ArrayIsNotSortedException();
             }
         }
-        return n - 2; // fallback
     }
 
-    protected double interpolate(double x, int floorIndex) {
-        if (count == 1) {
-            return getY(0);
-        }
-        double x0 = getX(floorIndex);
-        double y0 = getY(floorIndex);
-        double x1 = getX(floorIndex + 1);
-        double y1 = getY(floorIndex + 1);
-        if (x1 == x0) return y0;
-        double t = (x - x0) / (x1 - x0);
-        return y0 + t * (y1 - y0);
+    protected abstract int floorIndexOfX(double x);
+
+    protected abstract double extrapolateLeft(double x);
+    
+    protected abstract double extrapolateRight(double x);
+    
+    protected abstract double interpolate(double x, int floorIndex);
+    
+    protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
+        if (rightX == leftX) return leftY;
+        double t = (x - leftX) / (rightX - leftX);
+        return leftY + t * (rightY - leftY);
     }
 
-    protected double extrapolateLeft(double x) {
-        if (count == 1) return getY(0);
-        return interpolate(x, 0);
-    }
-
-    protected double extrapolateRight(double x) {
-        if (count == 1) return getY(0);
-        return interpolate(x, count - 2);
-    }
 
     @Override
     public double apply(double x) {
@@ -69,8 +51,12 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         if (x > rightBound()) {
             return extrapolateRight(x);
         }
-        int i = floorIndexOfX(x);
-        return interpolate(x, i);
+        int index = indexOfX(x);
+        if (index != -1) {
+            return getY(index);
+        }
+        int floorIndex = floorIndexOfX(x);
+        return interpolate(x, floorIndex);
     }
 }
 

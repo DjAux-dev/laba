@@ -1,22 +1,20 @@
 package functions;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public final class ArrayTabulatedFunction extends AbstractTabulatedFunction implements TabulatedFunction, Insertable {
+public final class ArrayTabulatedFunction extends AbstractTabulatedFunction implements TabulatedFunction, Insertable, Removable, Iterable<Point> {
     private double[] xValues;
     private double[] yValues;
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues == null || yValues == null) throw new IllegalArgumentException("null arrays");
-        if (xValues.length != yValues.length) throw new IllegalArgumentException("length mismatch");
-        this.count = 0;
-        this.xValues = new double[xValues.length];
-        this.yValues = new double[yValues.length];
-        for (int i = 0; i < xValues.length; i++) {
-            this.xValues[i] = xValues[i];
-            this.yValues[i] = yValues[i];
-            this.count++;
-        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
+        this.count = xValues.length;
+        this.xValues = Arrays.copyOf(xValues, xValues.length);
+        this.yValues = Arrays.copyOf(yValues, yValues.length);
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
@@ -87,6 +85,94 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
         this.xValues = newX;
         this.yValues = newY;
         this.count++;
+    }
+
+    @Override
+    public void remove(int index) {
+        if (index < 0 || index >= count) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for count " + count);
+        }
+        
+        // Создаём новые массивы размером на 1 меньше
+        double[] newX = new double[count - 1];
+        double[] newY = new double[count - 1];
+        
+        // Копируем элементы до удаляемого индекса
+        System.arraycopy(xValues, 0, newX, 0, index);
+        System.arraycopy(yValues, 0, newY, 0, index);
+        
+        // Копируем элементы после удаляемого индекса
+        System.arraycopy(xValues, index + 1, newX, index, count - index - 1);
+        System.arraycopy(yValues, index + 1, newY, index, count - index - 1);
+        
+        // Обновляем ссылки на массивы и счётчик
+        this.xValues = newX;
+        this.yValues = newY;
+        this.count--;
+    }
+
+    @Override
+    protected int floorIndexOfX(double x) {
+        if (count == 0) return -1;
+        if (x < xValues[0]) return -1;
+        if (x >= xValues[count - 1]) return count - 1;
+        
+        for (int i = 0; i < count - 1; i++) {
+            if (x >= xValues[i] && x < xValues[i + 1]) {
+                return i;
+            }
+        }
+        return count - 1;
+    }
+
+    @Override
+    protected double extrapolateLeft(double x) {
+        if (count == 1) return yValues[0];
+        return interpolate(x, xValues[0], xValues[1], yValues[0], yValues[1]);
+    }
+
+    @Override
+    protected double extrapolateRight(double x) {
+        if (count == 1) return yValues[0];
+        return interpolate(x, xValues[count - 2], xValues[count - 1], yValues[count - 2], yValues[count - 1]);
+    }
+
+    @Override
+    protected double interpolate(double x, int floorIndex) {
+        if (count == 1) return yValues[0];
+        if (floorIndex < 0) return extrapolateLeft(x);
+        if (floorIndex >= count - 1) return extrapolateRight(x);
+
+        double leftX = xValues[floorIndex];
+        double rightX = xValues[floorIndex + 1];
+        if (x < leftX || x > rightX) {
+            throw new exceptions.InterpolationException("x is out of interpolation interval");
+        }
+
+        return interpolate(x, leftX, rightX, 
+                         yValues[floorIndex], yValues[floorIndex + 1]);
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("No more points");
+                }
+                Point point = new Point(xValues[i], yValues[i]);
+                i++;
+                return point;
+            }
+        };
     }
 }
 

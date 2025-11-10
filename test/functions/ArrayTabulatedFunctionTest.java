@@ -140,3 +140,4 @@ public class ArrayTabulatedFunctionTest {
         TestUtils.assertAlmostEquals(9.0, func2.getY(0));
     }
 }
+
