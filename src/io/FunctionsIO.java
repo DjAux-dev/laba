@@ -4,10 +4,12 @@ import functions.Point;
 import functions.TabulatedFunction;
 import functions.TabulatedFunctionFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -50,7 +52,22 @@ public final class FunctionsIO {
     public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(stream);
         objectOutputStream.writeObject(function);
+        objectOutputStream.flush();
         stream.flush();
+    }
+
+    public static void serialize(ObjectOutputStream objectOutputStream, TabulatedFunction function) throws IOException {
+        objectOutputStream.writeObject(function);
+        objectOutputStream.flush();
+    }
+
+    public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
+        ObjectInputStream objectInputStream = new ObjectInputStream(stream);
+        return (TabulatedFunction) objectInputStream.readObject();
+    }
+
+    public static TabulatedFunction deserialize(ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
+        return (TabulatedFunction) objectInputStream.readObject();
     }
 }
 
