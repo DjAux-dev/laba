@@ -11,6 +11,9 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues == null || yValues == null) throw new IllegalArgumentException("null arrays");
+        if (xValues.length < 2) {
+            throw new IllegalArgumentException("Tabulated function length must be at least 2 points");
+        }
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
         this.count = xValues.length;
@@ -20,17 +23,12 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
         if (source == null) throw new IllegalArgumentException("source is null");
-        if (count <= 0) throw new IllegalArgumentException("count must be positive");
+        if (count < 2) throw new IllegalArgumentException("Tabulated function length must be at least 2 points");
         double a = xFrom, b = xTo;
         if (a > b) { double t = a; a = b; b = t; }
         this.xValues = new double[count];
         this.yValues = new double[count];
         this.count = count;
-        if (count == 1) {
-            xValues[0] = a;
-            yValues[0] = source.apply(a);
-            return;
-        }
         double step = (b - a) / (count - 1);
         for (int i = 0; i < count; i++) {
             double x = a + i * step;
@@ -40,13 +38,28 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
     }
 
     @Override
-    public double getX(int index) { return xValues[index]; }
+    public double getX(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index out of bounds: " + index);
+        }
+        return xValues[index];
+    }
 
     @Override
-    public double getY(int index) { return yValues[index]; }
+    public double getY(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index out of bounds: " + index);
+        }
+        return yValues[index];
+    }
 
     @Override
-    public void setY(int index, double value) { yValues[index] = value; }
+    public void setY(int index, double value) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index out of bounds: " + index);
+        }
+        yValues[index] = value;
+    }
 
     @Override
     public int indexOfX(double x) {
@@ -90,9 +103,7 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
 
     @Override
     public void remove(int index) {
-        if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for count " + count);
-        }
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         
         // Создаём новые массивы размером на 1 меньше
         double[] newX = new double[count - 1];
@@ -115,7 +126,7 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
     @Override
     protected int floorIndexOfX(double x) {
         if (count == 0) return -1;
-        if (x < xValues[0]) return -1;
+        if (x < xValues[0]) throw new IllegalArgumentException("x is less than left bound");
         if (x >= xValues[count - 1]) return count - 1;
         
         for (int i = 0; i < count - 1; i++) {
@@ -128,19 +139,16 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return yValues[0];
         return interpolate(x, xValues[0], xValues[1], yValues[0], yValues[1]);
     }
 
     @Override
     protected double extrapolateRight(double x) {
-        if (count == 1) return yValues[0];
         return interpolate(x, xValues[count - 2], xValues[count - 1], yValues[count - 2], yValues[count - 1]);
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
-        if (count == 1) return yValues[0];
         if (floorIndex < 0) return extrapolateLeft(x);
         if (floorIndex >= count - 1) return extrapolateRight(x);
 

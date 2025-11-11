@@ -32,6 +32,9 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
         if (xValues == null || yValues == null) {
             throw new IllegalArgumentException("xValues and yValues must not be null");
         }
+        if (xValues.length < 2) {
+            throw new IllegalArgumentException("Tabulated function length must be at least 2 points");
+        }
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
         for (int i = 0; i < xValues.length; i++) {
@@ -41,17 +44,13 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
         if (source == null) throw new IllegalArgumentException("source is null");
-        if (count <= 0) throw new IllegalArgumentException("count must be positive");
+        if (count < 2) throw new IllegalArgumentException("Tabulated function length must be at least 2 points");
         double a = xFrom;
         double b = xTo;
         if (a > b) {
             double t = a; a = b; b = t;
         }
-        if (count == 1) {
-            addNode(a, source.apply(a));
-            return;
-        }
-        double step = (count == 1) ? 0.0 : (b - a) / (count - 1);
+        double step = (b - a) / (count - 1);
         for (int i = 0; i < count; i++) {
             double x = a + i * step;
             addNode(x, source.apply(x));
@@ -59,7 +58,7 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
     }
 
     private Node getNode(int index) {
-        if (index < 0 || index >= count) throw new IndexOutOfBoundsException();
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         if (head == null) throw new IllegalStateException("Empty list");
         if (index <= count / 2) {
             Node cur = head;
@@ -74,16 +73,19 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
 
     @Override
     public double getX(int index) {
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         return getNode(index).x;
     }
 
     @Override
     public double getY(int index) {
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         return getNode(index).y;
     }
 
     @Override
     public void setY(int index, double value) {
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         getNode(index).y = value;
     }
 
@@ -123,7 +125,7 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
 
     @Override
     public void remove(int index) {
-        if (index < 0 || index >= count) throw new IndexOutOfBoundsException();
+        if (index < 0 || index >= count) throw new IllegalArgumentException("Index out of bounds: " + index);
         if (head == null) throw new IllegalStateException("Empty list");
         Node node = getNode(index);
         if (count == 1) {
@@ -188,7 +190,7 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
     @Override
     protected int floorIndexOfX(double x) {
         if (count == 0) return -1;
-        if (x < head.x) return -1;
+        if (x < head.x) throw new IllegalArgumentException("x is less than left bound");
         if (x >= head.prev.x) return count - 1;
         
         Node cur = head;
@@ -203,13 +205,11 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return head.y;
         return interpolate(x, head.x, head.next.x, head.y, head.next.y);
     }
 
     @Override
     protected double extrapolateRight(double x) {
-        if (count == 1) return head.y;
         Node last = head.prev;
         Node prevLast = last.prev;
         return interpolate(x, prevLast.x, last.x, prevLast.y, last.y);
@@ -217,7 +217,6 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
 
     @Override
     protected double interpolate(double x, int floorIndex) {
-        if (count == 1) return head.y;
         if (floorIndex < 0) return extrapolateLeft(x);
         if (floorIndex >= count - 1) return extrapolateRight(x);
 
