@@ -57,6 +57,24 @@ public class TabulatedFunctionOperationService {
         });
     }
 
+	public TabulatedFunction multiply(TabulatedFunction a, TabulatedFunction b) {
+		return doOperation(a, b, new BiOperation() {
+			@Override
+			public double apply(double u, double v) {
+				return u * v;
+			}
+		});
+	}
+
+	public TabulatedFunction divide(TabulatedFunction a, TabulatedFunction b) {
+		return doOperation(a, b, new BiOperation() {
+			@Override
+			public double apply(double u, double v) {
+				return u / v;
+			}
+		});
+	}
+
     private TabulatedFunction doOperation(TabulatedFunction a, TabulatedFunction b, BiOperation operation) {
         int n = a.getCount();
         if (n != b.getCount()) {
