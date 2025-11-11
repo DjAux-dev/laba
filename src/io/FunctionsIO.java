@@ -2,7 +2,7 @@ package io;
 
 import functions.Point;
 import functions.TabulatedFunction;
-import functions.TabulatedFunctionFactory;
+import functions.factory.TabulatedFunctionFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

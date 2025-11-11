@@ -1,7 +1,7 @@
 package io;
 
-import functions.ArrayTabulatedFunctionFactory;
-import functions.LinkedListTabulatedFunctionFactory;
+import functions.factory.ArrayTabulatedFunctionFactory;
+import functions.factory.LinkedListTabulatedFunctionFactory;
 import functions.TabulatedFunction;
 
 import java.io.BufferedReader;

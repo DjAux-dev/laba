@@ -2,8 +2,8 @@ package operations;
 
 import functions.Point;
 import functions.TabulatedFunction;
-import functions.TabulatedFunctionFactory;
-import functions.ArrayTabulatedFunctionFactory;
+import functions.factory.TabulatedFunctionFactory;
+import functions.factory.ArrayTabulatedFunctionFactory;
 import exceptions.InconsistentFunctionsException;
 
 public class TabulatedFunctionOperationService {
