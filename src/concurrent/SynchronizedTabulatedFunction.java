@@ -64,6 +64,16 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
         return new SynchronizedIterator(function.iterator());
     }
 
+    public interface Operation<T> {
+        T apply(SynchronizedTabulatedFunction function);
+    }
+
+    public <T> T doSynchronously(Operation<? extends T> operation) {
+        synchronized (mutex) {
+            return operation.apply(this);
+        }
+    }
+
     private class SynchronizedIterator implements Iterator<Point> {
         private final Iterator<Point> iterator;
 
