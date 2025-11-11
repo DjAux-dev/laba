@@ -9,11 +9,13 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -59,6 +61,18 @@ public final class FunctionsIO {
 			dos.writeDouble(function.getY(i));
 		}
 		dos.flush();
+	}
+
+	public static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream, TabulatedFunctionFactory factory) throws IOException {
+		DataInputStream dis = new DataInputStream(inputStream);
+		int count = dis.readInt();
+		double[] xValues = new double[count];
+		double[] yValues = new double[count];
+		for (int i = 0; i < count; i++) {
+			xValues[i] = dis.readDouble();
+			yValues[i] = dis.readDouble();
+		}
+		return factory.create(xValues, yValues);
 	}
 
     public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {

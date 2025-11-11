@@ -1,7 +1,10 @@
 package functions;
 
 public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable {
-    static class Node {
+    private static final long serialVersionUID = 3L;
+
+    static class Node implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
         public Node next;
         public Node prev;
         public double x;
