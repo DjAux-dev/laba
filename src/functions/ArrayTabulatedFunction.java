@@ -164,24 +164,7 @@ public final class ArrayTabulatedFunction extends AbstractTabulatedFunction impl
 
     @Override
     public Iterator<Point> iterator() {
-        return new Iterator<Point>() {
-            private int i = 0;
-
-            @Override
-            public boolean hasNext() {
-                return i < count;
-            }
-
-            @Override
-            public Point next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException("No more points");
-                }
-                Point point = new Point(xValues[i], yValues[i]);
-                i++;
-                return point;
-            }
-        };
+        throw new UnsupportedOperationException();
     }
 }
 

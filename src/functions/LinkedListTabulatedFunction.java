@@ -231,12 +231,11 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
     @Override
     public java.util.Iterator<Point> iterator() {
         return new java.util.Iterator<Point>() {
-            private Node current = head;
-            private int produced = 0;
+            private Node node = head;
 
             @Override
             public boolean hasNext() {
-                return produced < count;
+                return node != null;
             }
 
             @Override
@@ -244,9 +243,13 @@ public final class LinkedListTabulatedFunction extends AbstractTabulatedFunction
                 if (!hasNext()) {
                     throw new java.util.NoSuchElementException("No more points");
                 }
-                Point p = new Point(current.x, current.y);
-                current = current.next;
-                produced++;
+                Point p = new Point(node.x, node.y);
+                // advance node; if we reached the last (head.prev), null out to stop
+                if (node.next == head) {
+                    node = null;
+                } else {
+                    node = node.next;
+                }
                 return p;
             }
         };
