@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public final class ArrayTabulatedFunction extends AbstractTabulatedFunction implements TabulatedFunction, Insertable, Removable, Iterable<Point> {
+    private static final long serialVersionUID = 2L;
     private double[] xValues;
     private double[] yValues;
 

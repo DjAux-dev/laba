@@ -4,9 +4,11 @@ import functions.Point;
 import functions.TabulatedFunction;
 import functions.TabulatedFunctionFactory;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -43,6 +45,12 @@ public final class FunctionsIO {
             }
         }
         return factory.create(xValues, yValues);
+    }
+
+    public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(stream);
+        objectOutputStream.writeObject(function);
+        stream.flush();
     }
 }
 
