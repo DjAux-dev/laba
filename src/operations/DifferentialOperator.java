@@ -1,7 +1,8 @@
 package operations;
 
-public interface DifferentialOperator<T> {
-    T derive(T function);
-}
+import functions.MathFunction;
 
+public interface DifferentialOperator<T extends MathFunction> {
+	T derive(T function);
+}
 
