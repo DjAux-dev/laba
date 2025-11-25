@@ -19,6 +19,7 @@ public class SynchronizedTabulatedFunctionTest {
         testRightBound();
         testApply();
         testIterator();
+        testIteratorSnapshot();
         testDelegation();
     }
 
@@ -195,6 +196,28 @@ public class SynchronizedTabulatedFunctionTest {
         TestUtils.assertEquals(4, count);
         
         System.out.println("✓ iterator() test passed");
+    }
+
+    private static void testIteratorSnapshot() {
+        System.out.println("Testing iterator() snapshot behavior...");
+        double[] xValues = {0.0, 1.0, 2.0, 3.0};
+        double[] yValues = {0.0, 1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+        syncFunction.setY(0, 100.0);
+        syncFunction.setY(1, 200.0);
+
+        int index = 0;
+        while (iterator.hasNext()) {
+            Point point = iterator.next();
+            TestUtils.assertEquals(xValues[index], point.x);
+            TestUtils.assertEquals(yValues[index], point.y);
+            index++;
+        }
+        TestUtils.assertEquals(4, index);
+        System.out.println("✓ iterator() snapshot behavior test passed");
     }
 
     private static void testDelegation() {

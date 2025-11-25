@@ -2,6 +2,7 @@ package concurrent;
 
 import functions.Point;
 import functions.TabulatedFunction;
+import operations.TabulatedFunctionOperationService;
 
 import java.util.Iterator;
 
@@ -61,7 +62,20 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
     @Override
     public synchronized Iterator<Point> iterator() {
-        return new SynchronizedIterator(function.iterator());
+        Point[] snapshot = TabulatedFunctionOperationService.asPoints(function);
+        return new Iterator<Point>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < snapshot.length;
+            }
+
+            @Override
+            public Point next() {
+                return snapshot[index++];
+            }
+        };
     }
 
     public interface Operation<T> {
@@ -74,26 +88,5 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
         }
     }
 
-    private class SynchronizedIterator implements Iterator<Point> {
-        private final Iterator<Point> iterator;
-
-        SynchronizedIterator(Iterator<Point> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            synchronized (mutex) {
-                return iterator.hasNext();
-            }
-        }
-
-        @Override
-        public Point next() {
-            synchronized (mutex) {
-                return iterator.next();
-            }
-        }
-    }
 }
 
